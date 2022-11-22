@@ -21,7 +21,7 @@ import {
   productSearches,
 } from "./meta";
 
-const sqlite = new Database("northwind.sqlite");
+const sqlite = new Database("northwind.db");
 const db = new SQLiteBunConnector(sqlite).connect();
 
 const d1 = db.select(customers).prepare();
