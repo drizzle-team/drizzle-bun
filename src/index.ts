@@ -1,18 +1,10 @@
-import { bench, group, run } from "mitata";
 import { Database } from "bun:sqlite";
-import { asc, eq } from "drizzle-orm/expressions";
-import { alias } from "drizzle-orm-sqlite";
-import { SQLiteBunConnector } from "drizzle-orm-sqlite/bun";
 import { sql } from "drizzle-orm";
+import { alias } from "drizzle-orm-sqlite";
+import { drizzle } from "drizzle-orm-sqlite/bun";
+import { asc, eq } from "drizzle-orm/expressions";
 import { placeholder } from "drizzle-orm/sql";
-import {
-  employees,
-  customers,
-  suppliers,
-  products,
-  orders,
-  details,
-} from "./schema";
+import { bench, group, run } from "mitata";
 import {
   customerIds,
   customerSearches,
@@ -20,9 +12,17 @@ import {
   orderIds,
   productSearches,
 } from "./meta";
+import {
+  customers,
+  details,
+  employees,
+  orders,
+  products,
+  suppliers,
+} from "./schema";
 
 const sqlite = new Database("northwind.db");
-const db = new SQLiteBunConnector(sqlite).connect();
+const db = drizzle(sqlite);
 
 const d1 = db.select(customers).prepare();
 const d2 = db
@@ -76,40 +76,40 @@ const d10 = db
 
 group({ name: "drizzle", summary: false }, () => {
   bench("select * from customer", () => {
-    d1.execute();
+    d1.run();
   });
   bench("select * from customer where id = ?", () => {
     customerIds.forEach((id) => {
-      d2.execute({ userId: id });
+      d2.run({ userId: id });
     });
   });
 
   bench("select * from customer where company_name like ?", () => {
     customerSearches.forEach((it) => {
-      d3.execute({ name: `%${it}%` });
+      d3.run({ name: `%${it}%` });
     });
   });
 
   bench("SELECT * FROM employee", () => {
-    d4.execute();
+    d4.run();
   });
 
   bench("select * from employee where id = ? left join reportee", () => {
     employeeIds.forEach((id) => {
-      d5.execute({ employeeId: id });
+      d5.run({ employeeId: id });
     });
   });
   bench("SELECT * FROM supplier", () => {
-    d6.execute();
+    d6.run();
   });
 
   bench("SELECT * FROM product", () => {
-    d7.execute();
+    d7.run();
   });
 
   bench("SELECT * FROM product WHERE product.name LIKE ?", () => {
     productSearches.forEach((it) => {
-      d8.execute({ name: `%${it}%` });
+      d8.run({ name: `%${it}%` });
     });
   });
 
@@ -117,19 +117,14 @@ group({ name: "drizzle", summary: false }, () => {
     "SELECT * FROM order WHERE order_id = ? LEFT JOIN details and products",
     () => {
       orderIds.forEach((id) => {
-        d9.execute({ orderId: id });
+        d9.run({ orderId: id });
       });
     }
   );
 
   bench("select all order with sum and count", () => {
-    d10.execute();
+    d10.run();
   });
 });
 
-const main = async () => {
-  await run();
-  process.exit(1);
-};
-
-main();
+await run();

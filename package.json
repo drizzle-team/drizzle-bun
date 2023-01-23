@@ -1,0 +1,13 @@
+{
+  "name": "drizzle-bun",
+  "module": "index.ts",
+  "type": "module",
+  "devDependencies": {
+    "bun-types": "^0.4.0"
+  },
+  "dependencies": {
+    "drizzle-orm": "^0.16.0",
+    "drizzle-orm-sqlite": "^0.16.0",
+    "mitata": "^0.1.6"
+  }
+}
